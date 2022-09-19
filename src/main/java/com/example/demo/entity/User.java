@@ -5,6 +5,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -78,6 +80,13 @@ public class User implements Serializable {
 		this.roles = roles;
 	}
 	
+	public String getConfirmPassword() {
+		return confirmPassword;
+	}
+
+	public void setConfirmPassword(String confirmPassword) {
+		this.confirmPassword = confirmPassword;
+	}
 	
 	
 	
@@ -120,23 +129,38 @@ public class User implements Serializable {
 	@GenericGenerator(name="native",strategy="native")
 	private Long id;
 	
-	@Column 
+	@Column
+	@NotBlank
+	@Size(min=5,max=8,message="El tamano es excedido")
 	private String firstName;
 	@Column 
+	@NotBlank
 	private String lastName;
-	@Column(unique = true) 
+	
+	@Column(unique = true)
+	@NotBlank
 	private String email;
+	
 	@Column(unique = true) 
+	@NotBlank
 	private String username;
+	
 	@Column
+	@NotBlank
 	private String password;
 	
 	//Para que no se muestre en la base de datos 
 	//no sera mapeado en la BBDD y se omite en cualquier operacion como
 	//insert select 
 	@Transient 
+	@NotBlank
+	//@NotNull para un dato tipo primitivo
 	private String confirmPassword;
 	
+
+
+
+
 	//poble como clave foranea el id del rol 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name="user_roles"
