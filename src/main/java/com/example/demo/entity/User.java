@@ -131,8 +131,9 @@ public class User implements Serializable {
 	
 	@Column
 	@NotBlank
-	@Size(min=5,max=8,message="El tamano es excedido")
+	@Size(min=5,max=10,message="El tamano permitido esta excedido")
 	private String firstName;
+	
 	@Column 
 	@NotBlank
 	private String lastName;
@@ -153,7 +154,7 @@ public class User implements Serializable {
 	//no sera mapeado en la BBDD y se omite en cualquier operacion como
 	//insert select 
 	@Transient 
-	@NotBlank
+	//@NotBlank
 	//@NotNull para un dato tipo primitivo
 	private String confirmPassword;
 	
