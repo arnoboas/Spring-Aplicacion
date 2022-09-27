@@ -90,6 +90,18 @@ public class UserServiceImpl implements UserService {
 		
 
 	}
+
+	//@Override
+	public void deleteUser(Long id) throws Exception {
+		// TODO Auto-generated method stub
+		
+		User user = userRepository.findById(id)
+				.orElseThrow(() -> new Exception("User not Found in deleteUser -"
+												+this.getClass().getName()));
+		userRepository.delete(user);
+	}
+
+
 	
 
 
