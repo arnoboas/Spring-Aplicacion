@@ -1,5 +1,6 @@
 package com.example.demo.servicio;
 
+import com.example.demo.dto.ChangePasswordForm;
 import com.example.demo.entity.User;
 
 public interface UserService {
@@ -14,5 +15,6 @@ public interface UserService {
 	 
 	public void deleteUser(Long id) throws Exception;
 
+	public User changePassword(ChangePasswordForm form) throws Exception;
 	
 }

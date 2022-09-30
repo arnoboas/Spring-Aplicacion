@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.dto.ChangePasswordForm;
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
 
@@ -95,10 +96,42 @@ public class UserServiceImpl implements UserService {
 	public void deleteUser(Long id) throws Exception {
 		// TODO Auto-generated method stub
 		
-		User user = userRepository.findById(id)
-				.orElseThrow(() -> new Exception("User not Found in deleteUser -"
+		/*User user = userRepository.findById(id)
+				.orElseThrow(() -> new Exception("Usuario no existe para eliminar"
 												+this.getClass().getName()));
+		*/
+		User user = userRepository.findById(id)
+				.orElseThrow(() -> new Exception("Usuario no existe para eliminar"));
+		
+		
 		userRepository.delete(user);
+	}
+
+	@Override
+	public User changePassword(ChangePasswordForm form) throws Exception {
+		
+		/*User storedUser = userRepository
+				.findById( form.getId() )
+				.orElseThrow(() -> new Exception("El usuario no se encuentra en el ChangePassword-"+this.getClass().getName()));
+		*/
+		
+		User user=getUserById(form.getId());
+		
+		if( !user.getPassword().equals(form.getCurrentPassword())) {
+			throw new Exception("Current Password Invalido.");
+		}
+		
+		if ( user.getPassword().equals(form.getNewPassword())) {
+			throw new Exception("New Password debe ser diferente del Current Password!");
+		}
+		
+		if( !form.getNewPassword().equals(form.getConfirmPassword())) {
+			throw new Exception("New Password y Confirm Password no son iguales!");
+		}
+		
+		user.setPassword(form.getNewPassword());
+		return userRepository.save(user);
+	
 	}
 
 
