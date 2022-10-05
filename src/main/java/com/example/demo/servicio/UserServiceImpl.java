@@ -3,6 +3,10 @@ package com.example.demo.servicio;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.ChangePasswordForm;
@@ -15,6 +19,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	UserRepository userRepository;
+	
+	@Autowired
+	BCryptPasswordEncoder bCryptPasswordEncoder;
 	
 	
 	@Override
@@ -52,6 +59,10 @@ public class UserServiceImpl implements UserService {
 	public User createUser(User user) throws Exception {
 		
 		if(checkUsernameAvailable(user) && checkPasswordValid(user)) {
+			
+			//Encriptar contrasena de nuevo usuarip antes de que se guarde
+			String encodePassword =bCryptPasswordEncoder.encode(user.getPassword());
+			user.setPassword(encodePassword);
 			
 			user=userRepository.save(user);
 		}
@@ -93,6 +104,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	//@Override
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
 	public void deleteUser(Long id) throws Exception {
 		// TODO Auto-generated method stub
 		
@@ -117,7 +129,7 @@ public class UserServiceImpl implements UserService {
 		
 		User user=getUserById(form.getId());
 		
-		if( !user.getPassword().equals(form.getCurrentPassword())) {
+		if( !isLoggedUserADMIN() && !user.getPassword().equals(form.getCurrentPassword())) {
 			throw new Exception("Current Password Invalido.");
 		}
 		
@@ -128,15 +140,36 @@ public class UserServiceImpl implements UserService {
 		if( !form.getNewPassword().equals(form.getConfirmPassword())) {
 			throw new Exception("New Password y Confirm Password no son iguales!");
 		}
+
+
 		
-		user.setPassword(form.getNewPassword());
+		//Codificar passwrod con Spring security antes de guardar el nuevo password que cambio el usuario
+		String encodePassword =bCryptPasswordEncoder.encode(form.getNewPassword());
+		user.setPassword(encodePassword);
 		return userRepository.save(user);
+		
+
+
 	
 	}
-
-
 	
+	public boolean isLoggedUserADMIN(){
 
+		
+		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		UserDetails loggedUser = null;
+		//Object roles = null; 
+		if (principal instanceof UserDetails) {
+			loggedUser = (UserDetails) principal;
+		
+			loggedUser.getAuthorities().stream()
+					.filter(x -> "ADMIN".equals(x.getAuthority() ))      
+					.findFirst().orElse(null); //loggedUser = null;
+		}
+		
+		return loggedUser != null ?true :false;
+		
+	}
 
 
 
