@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.Exception.UsernameOrIdNotFound;
 import com.example.demo.dto.ChangePasswordForm;
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
@@ -71,9 +72,9 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public User getUserById(long id) throws Exception {
+	public User getUserById(long id) throws UsernameOrIdNotFound {
 
-		User user = userRepository.findById(id).orElseThrow(() -> new Exception("Usuario no existe"));
+		User user = userRepository.findById(id).orElseThrow(() -> new UsernameOrIdNotFound("El id o el usuario no existe"));
 		return user;
 	}
 
@@ -105,7 +106,7 @@ public class UserServiceImpl implements UserService {
 
 	//@Override
 	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
-	public void deleteUser(Long id) throws Exception {
+	public void deleteUser(Long id) throws UsernameOrIdNotFound {
 		// TODO Auto-generated method stub
 		
 		/*User user = userRepository.findById(id)
@@ -113,7 +114,7 @@ public class UserServiceImpl implements UserService {
 												+this.getClass().getName()));
 		*/
 		User user = userRepository.findById(id)
-				.orElseThrow(() -> new Exception("Usuario no existe para eliminar"));
+				.orElseThrow(() -> new UsernameOrIdNotFound("Usuario no existe para eliminar"));
 		
 		
 		userRepository.delete(user);
